@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -129,7 +130,14 @@ public class Servidor extends JFrame implements Runnable{
             Socket cl = servidor.accept();
             this.addMensajeInfo("Cliente conectado");
             
-            Manejador manejador = new Manejador(cl, this);
+            //Manejador manejador = new Manejador(cl, this);
+            Thread manejador = new Thread(new Manejador(cl, this));
+            manejador.start();
+            try {
+                manejador.join();
+            } catch (InterruptedException ex) {
+                this.addMensajeInfo("Problemas con la finalizacion de onexion con cliente");
+            }
             
             this.addMensajeInfo("Servicio Terminado");
             jbtnStart.setEnabled(true);

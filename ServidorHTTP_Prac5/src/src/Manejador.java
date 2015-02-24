@@ -42,7 +42,7 @@ public class Manejador extends Utileria implements Runnable{
         log.info("Flujos de lectura y escritura construidos Ok.");
         this.serv = servidor;
         
-        FileServerPage = System.getProperty("")+
+        FileServerPage = System.getProperty("user.dir")+
                 System.getProperty("System.line")+
                 "Resource"+
                 System.getProperty("System.line")+
