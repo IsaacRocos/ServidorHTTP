@@ -13,9 +13,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.CharBuffer;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 /**
  *
@@ -52,14 +53,60 @@ public class Manejador extends Utileria implements Runnable {
         try {
             serv.addMensajeInfo("Cliente conectado desde: " + cl.getInetAddress());
             serv.addMensajeInfo("Por el puerto: " + cl.getPort());
-            String linea = br.readLine();
-            serv.addMensajeInfo("Datos: " + linea);
-            if ("".equals(linea) || linea == null) {
+            String line = br.readLine();
+            serv.addMensajeInfo("Datos: " + line);
+
+            if ("".equals(line) || line == null) {
                 SendA(FileServerPage);
-            } else if (!linea.contains("?")) {
-                reedireccionar(linea);
-            } else if (linea.startsWith("GET")) {
-                StringTokenizer st = new StringTokenizer(linea, "?");
+            } else if (line.startsWith("POST")) {
+                System.out.println("<" + line + ">");
+                char[] bufer = new char[2500];
+                String peticion = "";
+                try {
+                    br.read(bufer, 0, bufer.length);
+                    System.out.println(bufer);
+                    peticion = new String(bufer); // Contiene Petición post completa e un string
+                    String [] arr = peticion.split("\n");
+                    peticion = arr[arr.length-1]; // Obtener linea de parametros
+                    System.out.println(peticion);
+                    
+                } catch (IOException ex) {
+                    System.out.println("Fin de cadena");
+                }
+                pw.println("HTTP/1.0 201 Created");
+                pw.flush();
+                pw.println();
+                pw.flush();
+                pw.print("<html><head><title>SERVIDOR WEB");
+                pw.flush();
+                pw.print("</title></head><body bgcolor=\"#AACCFF\"><h3><br>Parametros POST obtenidos:</br></h3>");
+                pw.flush();
+                String patron = "\\+";
+                peticion = peticion.replaceAll(patron, " ");
+                peticion = peticion.replaceAll("%0D%0A", "<br> ");
+                peticion = peticion.replaceAll("HTTP/1.1", " ");
+                peticion = peticion.replaceAll("=", "= ");
+                StringTokenizer streq = new StringTokenizer(peticion, "&");
+                pw.print("<ul>");
+                pw.flush();
+                while (streq.hasMoreTokens()) {
+                    pw.print("<li>" + streq.nextToken() + "</li>");
+                    pw.flush();
+                }
+                pw.print("</ul><br><br><a href=\"index.html\">Inicio</a>");
+                pw.flush();
+                pw.print("</body></html>");
+                pw.flush();
+                pw.println("\n\r");
+                pw.flush();
+                cl.close();
+
+            } else if (!line.contains(
+                    "?")) {
+                reedireccionar(line);
+            } else if (line.startsWith(
+                    "GET")) {
+                StringTokenizer st = new StringTokenizer(line, "?");
                 String req_a = st.nextToken();
                 String req = st.nextToken();
                 System.out.println("Token1: " + req_a + "\r\n\r\n");
@@ -85,15 +132,13 @@ public class Manejador extends Utileria implements Runnable {
                     pw.print("<li>" + streq.nextToken() + "</li>");
                     pw.flush();
                 }
-                pw.print("</ul>");
+                pw.print("</ul><br><br><a href=\"index.html\">Inicio</a>");
                 pw.flush();
                 pw.print("</body></html>");
                 pw.flush();
                 pw.println("\n\r");
                 pw.flush();
                 cl.close();
-            } else if (linea.startsWith("POST")) {
-                System.out.println("POST");
             } else {
                 pw.println("HTTP/1.0 501 Not Implemented");
                 cl.close();
