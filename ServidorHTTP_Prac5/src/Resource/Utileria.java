@@ -14,6 +14,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import src.Servidor;
 
 /**
@@ -29,6 +31,7 @@ public class Utileria {
     protected String FileServerPage;
     protected String FileName;
     protected Servidor serv;
+    protected int tipoGet_Head;
 
     public String getArch(String line) {
         int i;
@@ -37,6 +40,13 @@ public class Utileria {
             i = line.indexOf("/");
             f = line.indexOf(" ", i);
             FileName = line.substring(i + 1, f);
+            this.tipoGet_Head=0;
+        }
+         if (line.toUpperCase().startsWith("GET")) {
+            i = line.indexOf("/");
+            f = line.indexOf(" ", i);
+            FileName = line.substring(i + 1, f);
+            this.tipoGet_Head=1;
         }
         return FileName;
     }
@@ -51,12 +61,21 @@ public class Utileria {
                     + "pages"
                     + System.getProperty("file.separator")
                     + "index.html";
+        }else{
+            FileName = System.getProperty("user.dir")
+                    + System.getProperty("file.separator")
+                    + "src" + System.getProperty("file.separator")
+                    + "pages"
+                    + System.getProperty("file.separator")
+                    + FileName;
         }
         SendA(FileName);
         serv.addMensajeInfo("Archivo reedireccionado: " + FileName);
+        FileName = "";
     }
 
     public void SendA(String arg) {
+        int tam_archivo = 0;
         try {
             int b_leidos;
             try (BufferedInputStream bis2 = new BufferedInputStream(new FileInputStream(arg))) {
@@ -67,7 +86,7 @@ public class Utileria {
                 } else {
                     tam_bloque = bis2.available();
                 }
-                int tam_archivo = bis2.available();
+                tam_archivo = bis2.available();
                 buf = new byte[tam_bloque];
                 /**
                  * ********************************************
@@ -100,7 +119,22 @@ public class Utileria {
                 serv.addMensajeInfo("Recurso enviado");
             }
         } catch (IOException e) {
-            serv.addMensajeError("Error al enviar el archivo " + arg + " : " + e.getMessage());
+            try {
+                serv.addMensajeError("Error al enviar el archivo " + arg + " : " + e.getMessage());
+                System.out.println("Escribiendo cabecera HTTP de error");
+                    String sb = "";
+                    sb = sb + "HTTP/1.0 500 \n";
+                    sb = sb + "Server: II_PR_CE/1.0 \n";
+                    sb = sb + "Date: " + new Date() + " \n";
+                    sb = sb + "Content-Type: text/html \n";
+                    sb = sb + "Content-Length: " + tam_archivo + " \n";
+                    sb = sb + "\n";
+                    
+                    bos.write(sb.getBytes());
+                    bos.flush();
+            } catch (IOException ex) {
+                serv.addMensajeError("Error al enviar cabecera de error " + arg + " : " + e.getMessage());
+            }
         }
     }
 

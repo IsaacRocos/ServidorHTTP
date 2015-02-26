@@ -58,7 +58,7 @@ public class Manejador extends Utileria implements Runnable {
 
             if ("".equals(line) || line == null) {
                 SendA(FileServerPage);
-            } else if (line.startsWith("POST")) {
+            } else if (line.startsWith("POST")) {  //POST
                 System.out.println("<" + line + ">");
                 char[] bufer = new char[2500];
                 String peticion = "";
@@ -66,10 +66,10 @@ public class Manejador extends Utileria implements Runnable {
                     br.read(bufer, 0, bufer.length);
                     System.out.println(bufer);
                     peticion = new String(bufer); // Contiene Petición post completa e un string
-                    String [] arr = peticion.split("\n");
-                    peticion = arr[arr.length-1]; // Obtener linea de parametros
+                    String[] arr = peticion.split("\n");
+                    peticion = arr[arr.length - 1]; // Obtener linea de parametros
                     System.out.println(peticion);
-                    
+
                 } catch (IOException ex) {
                     System.out.println("Fin de cadena");
                 }
@@ -101,11 +101,9 @@ public class Manejador extends Utileria implements Runnable {
                 pw.flush();
                 cl.close();
 
-            } else if (!line.contains(
-                    "?")) {
+            } else if (!line.contains("?")) {
                 reedireccionar(line);
-            } else if (line.startsWith(
-                    "GET")) {
+            } else if (line.startsWith("GET")) {                     //GET
                 StringTokenizer st = new StringTokenizer(line, "?");
                 String req_a = st.nextToken();
                 String req = st.nextToken();
@@ -135,6 +133,17 @@ public class Manejador extends Utileria implements Runnable {
                 pw.print("</ul><br><br><a href=\"index.html\">Inicio</a>");
                 pw.flush();
                 pw.print("</body></html>");
+                pw.flush();
+                pw.println("\n\r");
+                pw.flush();
+                cl.close();
+            } else if (line.startsWith("HEAD")) {
+                StringTokenizer st = new StringTokenizer(line, "?");
+                String req_a = st.nextToken();
+                String req = st.nextToken();
+                System.out.println("Token1: " + req_a + "\r\n\r\n");
+                System.out.println("Token2: " + req + "\r\n\r\n");
+                pw.println("HTTP/1.0 200 Okay");
                 pw.flush();
                 pw.println("\n\r");
                 pw.flush();
