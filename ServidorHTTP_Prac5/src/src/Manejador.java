@@ -44,7 +44,7 @@ public class Manejador extends Utileria implements Runnable {
         this.serv = servidor;
 
         String separador = System.getProperty("file.separator");
-        FileServerPage = System.getProperty("user.dir") + separador + "Resource" + separador + "ServerPage.html";
+        //FileServerPage = System.getProperty("user.dir") + separador + "Resource" + separador + "ServerPage.html";
 
     }
 
@@ -57,7 +57,7 @@ public class Manejador extends Utileria implements Runnable {
             serv.addMensajeInfo("Datos: " + line);
 
             if ("".equals(line) || line == null) {
-                SendA(FileServerPage);
+                reedireccionar(line);
             } else if (line.startsWith("POST")) {  //POST
                 System.out.println("<" + line + ">");
                 char[] bufer = new char[2500];
@@ -73,7 +73,7 @@ public class Manejador extends Utileria implements Runnable {
                 } catch (IOException ex) {
                     System.out.println("Fin de cadena");
                 }
-                pw.println("HTTP/1.0 201 Created");
+                pw.println("HTTP/1.1 201 Created");
                 pw.flush();
                 pw.println();
                 pw.flush();
@@ -100,7 +100,6 @@ public class Manejador extends Utileria implements Runnable {
                 pw.println("\n\r");
                 pw.flush();
                 cl.close();
-
             } else if (!line.contains("?")) {
                 reedireccionar(line);
             } else if (line.startsWith("GET")) {                     //GET
@@ -109,7 +108,7 @@ public class Manejador extends Utileria implements Runnable {
                 String req = st.nextToken();
                 System.out.println("Token1: " + req_a + "\r\n\r\n");
                 System.out.println("Token2: " + req + "\r\n\r\n");
-                pw.println("HTTP/1.0 200 Okay");
+                pw.println("HTTP/1.1 200 Okay");
                 pw.flush();
                 pw.println();
                 pw.flush();
@@ -143,13 +142,13 @@ public class Manejador extends Utileria implements Runnable {
                 String req = st.nextToken();
                 System.out.println("Token1: " + req_a + "\r\n\r\n");
                 System.out.println("Token2: " + req + "\r\n\r\n");
-                pw.println("HTTP/1.0 200 Okay");
+                pw.println("HTTP/1.1 200 Okay");
                 pw.flush();
                 pw.println("\n\r");
                 pw.flush();
                 cl.close();
             } else {
-                pw.println("HTTP/1.0 501 Not Implemented");
+                pw.println("HTTP/1.1 501 Not Implemented");
                 cl.close();
                 pw.println();
             }
