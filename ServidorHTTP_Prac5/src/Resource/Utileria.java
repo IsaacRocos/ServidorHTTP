@@ -98,7 +98,7 @@ public class Utileria {
                 sb = sb + "Date: " + new Date() + " \n";
                 sb = sb + "Content-Type: text/html \n";
                 sb = sb + "Content-Length: " + tam_archivo + " \n";
-                sb = sb + "\n";
+                sb = sb + "\r\n";
                 bos.write(sb.getBytes());
                 bos.flush();
                 /**
@@ -144,7 +144,7 @@ public class Utileria {
                     sb = sb + "Date: " + new Date() + " \n";
                     sb = sb + "Content-Type: text/html \n";
                     sb = sb + "Content-Length: " + tam_archivo + " \n";
-                    sb = sb + "\n";
+                    sb = sb + "\r\n";
                     bos.write(sb.getBytes());
                     bos.flush();
 
@@ -160,7 +160,6 @@ public class Utileria {
                         serv.addMensajeInfo("\tBytes leidos: " + buf.length);
                     }
                     bos.flush();
-                    bos.write("\n\r".getBytes());
                     serv.addMensajeInfo("Recurso enviado");
                 }
             } catch (IOException ex) {

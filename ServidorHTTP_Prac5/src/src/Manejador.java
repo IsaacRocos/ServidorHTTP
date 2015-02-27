@@ -56,7 +56,7 @@ public class Manejador extends Utileria implements Runnable {
             String line = br.readLine();
             serv.addMensajeInfo("Datos: " + line);
 
-            if ("".equals(line) || line == null) {
+            if ("".equals(line)) {
                 reedireccionar(line);
             } else if (line.startsWith("POST")) {  //POST
                 System.out.println("<" + line + ">");
@@ -147,13 +147,16 @@ public class Manejador extends Utileria implements Runnable {
                 pw.println("\n\r");
                 pw.flush();
                 cl.close();
-            } else {
-                pw.println("HTTP/1.1 501 Not Implemented");
+            } else if(line == null){
+                pw.println("HTTP/1.1 500 Internal Server Error");
+                pw.println("\r\n");
                 cl.close();
                 pw.println();
             }
         } catch (IOException ex) {
             serv.addMensajeInfo("Error al leer la petici\u00f3n: " + ex.getMessage());
+        }catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
